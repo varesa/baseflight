@@ -234,3 +234,5 @@ help:
 	@echo ""
 	@echo "Valid TARGET values are: $(VALID_TARGETS)"
 	@echo ""
+
+all: $(TARGET_HEX)
