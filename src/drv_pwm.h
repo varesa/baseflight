@@ -8,6 +8,7 @@
 typedef struct drv_pwm_config_t {
     bool enableInput;
     bool usePPM;
+    bool usePPMPWM;
     bool useUART;
     bool useSoftSerial;
     bool useServos;

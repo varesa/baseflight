@@ -98,6 +98,24 @@ static const uint8_t multiPWM[] = {
     0xFF
 };
 
+static const uint8_t multiPPMPWM[] = {
+	PWM1 | TYPE_IP, 	// PPM channels 1-5
+/*	PWM2 | ,			// PWMs 1-4 are on same timer, so can't be used
+	PWM3 | ,			// for multiple tasks
+	PWM4 | , */
+	PWM5 | TYPE_M,
+	PWM6 | TYPE_IW,	 	// PWM input #6
+	PWM7 | TYPE_IW,		// PWM input #7
+	PWM8 | TYPE_IW,		// PWM input #8
+	PWM9  | TYPE_M,     // motor #1
+	PWM10 | TYPE_M,     // motor #2
+	PWM11 | TYPE_M,     // motor #3
+	PWM12 | TYPE_M,     // motor #4
+	PWM13 | TYPE_M,     // motor #5
+	PWM14 | TYPE_M,     // motor #6
+	0xFF
+};
+
 static const uint8_t airPPM[] = {
     PWM1 | TYPE_IP,     // PPM input
     PWM9 | TYPE_M,      // motor #1
@@ -136,6 +154,7 @@ static const uint8_t * const hardwareMaps[] = {
     multiPPM,
     airPWM,
     airPPM,
+    multiPPMPWM
 };
 
 #define PWM_TIMER_MHZ 1
@@ -311,11 +330,14 @@ bool pwmInit(drv_pwm_config_t *init)
     // to avoid importing cfg/mcfg
     failsafeThreshold = init->failsafeThreshold;
 
-    // this is pretty hacky shit, but it will do for now. array of 4 config maps, [ multiPWM multiPPM airPWM airPPM ]
+    // this is pretty hacky shit, but it will do for now. array of 5 config maps, [ multiPWM multiPPM airPWM airPPM multiPPMPWM]
     if (init->airplane)
         i = 2; // switch to air hardware config
     if (init->usePPM)
         i++; // next index is for PPM
+    if (init->usePPMPWM)
+    	i = 4; // Use combination of PPM and PWM
+
 
     setup = hardwareMaps[i];
 
@@ -362,7 +384,10 @@ bool pwmInit(drv_pwm_config_t *init)
 
         if (mask & TYPE_IP) {
             pwmInConfig(port, ppmCallback, 0);
-            numInputs = 8;
+            if (init->usePPMPWM)
+            	numInputs = 5;
+            else
+            	numInputs = 8;
         } else if (mask & TYPE_IW) {
             pwmInConfig(port, pwmCallback, numInputs);
             numInputs++;
