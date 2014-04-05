@@ -637,8 +637,8 @@ static void evaluateOtherData(uint8_t sr)
             cliProcess();
             break;
         case 'R':
-						if(!f.ARMED)
-						    systemReset(true);      // reboot to bootloader
+            if(!f.ARMED)
+                systemReset(true);      // reboot to bootloader
             break;
     }
 }
