@@ -272,7 +272,7 @@ typedef struct master_t {
 
     // gps-related stuff
     uint8_t gps_type;                       // Type of GPS hardware. 0: NMEA 1: UBX 2: MTK NMEA 3: MTK Binary
-    int8_t gps_baudrate;                    // GPS baudrate, -1: autodetect (NMEA only), 0: 115200, 1: 57600, 2: 38400, 3: 19200, 4: 9600
+    int8_t gps_baudrate;                    // GPS baudrate, 0: 115200, 1: 57600, 2: 38400, 3: 19200, 4: 9600. NMEA will cycle through these until valid data is received
 
     uint32_t serial_baudrate;
 
@@ -284,6 +284,7 @@ typedef struct master_t {
     uint8_t telemetry_switch;               // Use aux channel to change serial output & baudrate( MSP / Telemetry ). It disables automatic switching to Telemetry when armed.
     config_t profile[3];                    // 3 separate profiles
     uint8_t current_profile;                // currently loaded profile
+    uint8_t reboot_character;               // which byte is used to reboot. Default 'R', could be changed carefully to something else.
 
     uint8_t magic_ef;                       // magic number, should be 0xEF
     uint8_t chk;                            // XOR checksum
