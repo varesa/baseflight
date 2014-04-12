@@ -635,7 +635,7 @@ static void evaluateOtherData(uint8_t sr)
 {
 	if (sr == '#')
         cliProcess();
-    else if (sr == mcfg.reboot_character && !f.ARMED)
+    else if (sr == mcfg.reboot_character)
         systemReset(true);      // reboot to bootloader
 }
 
