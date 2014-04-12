@@ -30,6 +30,9 @@ extern const char rcChannelLetters[];
 // from mixer.c
 extern int16_t motor_disarmed[MAX_MOTORS];
 
+// signal that we're in cli mode
+uint8_t cliMode = 0;
+
 // buffer
 static char cliBuffer[48];
 static uint32_t bufferIndex = 0;
@@ -130,10 +133,11 @@ const clivalue_t valueTable[] = {
     { "softserial_baudrate", VAR_UINT32, &mcfg.softserial_baudrate, 1200, 19200 },
     { "softserial_1_inverted", VAR_UINT8, &mcfg.softserial_1_inverted, 0, 1 },
     { "softserial_2_inverted", VAR_UINT8, &mcfg.softserial_2_inverted, 0, 1 },
-    { "gps_type", VAR_UINT8, &mcfg.gps_type, 0, 3 },
-    { "gps_baudrate", VAR_INT8, &mcfg.gps_baudrate, 0, 4 },
+    { "gps_type", VAR_UINT8, &mcfg.gps_type, 0, GPS_HARDWARE_MAX },
+    { "gps_baudrate", VAR_INT8, &mcfg.gps_baudrate, 0, GPS_BAUD_MAX },
     { "serialrx_type", VAR_UINT8, &mcfg.serialrx_type, 0, 3 },
-    { "telemetry_softserial", VAR_UINT8, &mcfg.telemetry_softserial, 0, 1 },
+    { "telemetry_provider", VAR_UINT8, &mcfg.telemetry_provider, 0, TELEMETRY_PROVIDER_MAX },
+    { "telemetry_port", VAR_UINT8, &mcfg.telemetry_port, 0, TELEMETRY_PORT_MAX },
     { "telemetry_switch", VAR_UINT8, &mcfg.telemetry_switch, 0, 1 },
     { "vbatscale", VAR_UINT8, &mcfg.vbatscale, 10, 200 },
     { "vbatmaxcellvoltage", VAR_UINT8, &mcfg.vbatmaxcellvoltage, 10, 50 },
@@ -157,13 +161,16 @@ const clivalue_t valueTable[] = {
     { "yawdeadband", VAR_UINT8, &cfg.yawdeadband, 0, 100 },
     { "alt_hold_throttle_neutral", VAR_UINT8, &cfg.alt_hold_throttle_neutral, 1, 250 },
     { "alt_hold_fast_change", VAR_UINT8, &cfg.alt_hold_fast_change, 0, 1 },
-    { "throttle_angle_correction", VAR_UINT8, &cfg.throttle_angle_correction, 0, 100 },
+    { "throttle_correction_value", VAR_UINT8, &cfg.throttle_correction_value, 0, 150 },
+    { "throttle_correction_angle", VAR_UINT16, &cfg.throttle_correction_angle, 1, 900 },
     { "rc_rate", VAR_UINT8, &cfg.rcRate8, 0, 250 },
     { "rc_expo", VAR_UINT8, &cfg.rcExpo8, 0, 100 },
     { "thr_mid", VAR_UINT8, &cfg.thrMid8, 0, 100 },
     { "thr_expo", VAR_UINT8, &cfg.thrExpo8, 0, 100 },
     { "roll_pitch_rate", VAR_UINT8, &cfg.rollPitchRate, 0, 100 },
     { "yawrate", VAR_UINT8, &cfg.yawRate, 0, 100 },
+    { "tparate", VAR_UINT8, &cfg.dynThrPID, 0, 100},
+    { "tpa_breakpoint", VAR_UINT16, &cfg.tpaBreakPoint, 1000, 2000},
     { "failsafe_delay", VAR_UINT8, &cfg.failsafe_delay, 0, 200 },
     { "failsafe_off_delay", VAR_UINT8, &cfg.failsafe_off_delay, 0, 200 },
     { "failsafe_throttle", VAR_UINT16, &cfg.failsafe_throttle, 1000, 2000 },
